@@ -1,6 +1,6 @@
 const db = require('../config/db');
 
-exports.createUser = (nombre_completo, correo, edad, genero, altura, nivel_actividad, password, callback) => {
+exports.createUser = ({ nombre_completo, correo, edad, genero, altura, nivel_actividad, password }, callback) => {
     const sql = `INSERT INTO usuarios (nombre_completo, correo, edad, genero, altura, nivel_actividad, password) VALUES (?, ?, ?, ?, ?, ?, ?)`;
     db.query(sql, [nombre_completo, correo, edad, genero, altura, nivel_actividad, password], callback);
 };

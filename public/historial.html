@@ -6,8 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CalBalance - Historial de Consumo</title>
     <link rel="stylesheet" href="css/styleHistorial.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"
+        integrity="sha384-vsrfeLOOY6KuIYKDlmVH5UiBmgIdB1oEf7p01YgWHuqmOHfZr374+odEv96n9tNC"
+        crossorigin="anonymous"></script>
 </head>
 
 <body>
@@ -45,7 +46,7 @@
                 <canvas id="caloriesChart"></canvas>
             </div>
         </section>
-        
+
 
         <!-- Sección de resumen que aparecerá al hacer clic en los botones -->
         <section class="summary-section" id="summary-section">
@@ -95,6 +96,10 @@
 
                 <label for="calories">Calorías</label>
                 <input type="text" id="calories" name="calories" readonly>
+                <p id="calorie-info" class="info-text">
+                    El cálculo de calorías se realiza multiplicando las calorías por porción del alimento seleccionado
+                    por la cantidad especificada (en gramos, kilogramos o tazas) y luego dividiendo entre 100.
+                </p>
 
                 <label for="meal-type">Tipo de Comida</label>
                 <select id="meal-type" name="meal-type" required>
@@ -239,7 +244,12 @@
             const selectedOption = this.selectedOptions[0];
             const caloriasPorPorcion = parseInt(selectedOption.getAttribute("data-calorias")) || 0;
             const porcion = parseInt(document.getElementById("portion").value) || 0;
-            document.getElementById("calories").value = (caloriasPorPorcion * porcion / 100).toFixed(2);
+            const caloriasCalculadas = (caloriasPorPorcion * porcion / 100).toFixed(2);
+            document.getElementById("calories").value = caloriasCalculadas;
+
+            // Actualizar el mensaje explicativo
+            const infoText = `Cálculo: (${caloriasPorPorcion} cal/porción * ${porcion} g) / 100 = ${caloriasCalculadas} cal`;
+            document.getElementById("calorie-info").textContent = infoText;
         });
 
         document.getElementById("portion").addEventListener("input", function () {
@@ -247,7 +257,12 @@
             const selectedOption = foodSelect.selectedOptions[0];
             const caloriasPorPorcion = parseInt(selectedOption.getAttribute("data-calorias")) || 0;
             const porcion = parseInt(this.value) || 0;
-            document.getElementById("calories").value = (caloriasPorPorcion * porcion / 100).toFixed(2);
+            const caloriasCalculadas = (caloriasPorPorcion * porcion / 100).toFixed(2);
+            document.getElementById("calories").value = caloriasCalculadas;
+
+            // Actualizar el mensaje explicativo
+            const infoText = `Cálculo: (${caloriasPorPorcion} cal/porción * ${porcion} g) / 100 = ${caloriasCalculadas} cal`;
+            document.getElementById("calorie-info").textContent = infoText;
         });
 
         // Registrar consumo de alimentos
@@ -314,10 +329,10 @@
         }
 
         document.querySelectorAll('.day-checkboxes input[type="checkbox"]').forEach(checkbox => {
-            checkbox.addEventListener('change', async function() {
+            checkbox.addEventListener('change', async function () {
                 const selectedDays = Array.from(document.querySelectorAll('.day-checkboxes input[type="checkbox"]:checked'))
                     .map(input => input.value);
-        
+
                 if (selectedDays.length === 0) {
                     document.getElementById("day-card-container").style.display = "none";
                     document.getElementById("day-card-container").innerHTML = ""; // Limpiar datos
@@ -327,16 +342,16 @@
                 }
             });
         });
-        
+
         async function loadSelectedDaysData(selectedDays) {
             const userId = userId/* Obtener el userId si es necesario */;
             const container = document.getElementById("day-card-container");
             container.innerHTML = ""; // Limpiar datos anteriores
-        
+
             try {
                 const response = await fetch(`/api/foods/history/${userId}`);
                 const history = await response.json();
-        
+
                 const groupedByDay = history.reduce((acc, item) => {
                     if (selectedDays.includes(item.dia)) {
                         if (!acc[item.dia]) acc[item.dia] = [];
@@ -344,12 +359,12 @@
                     }
                     return acc;
                 }, {});
-        
+
                 Object.keys(groupedByDay).forEach(day => {
                     const dayCard = document.createElement("div");
                     dayCard.classList.add("day-card");
                     dayCard.innerHTML = `<h3>${day}</h3><table><thead><tr><th>Hora</th><th>Alimento</th><th>Cantidad</th><th>Calorías</th></tr></thead><tbody></tbody></table>`;
-        
+
                     const tbody = dayCard.querySelector("tbody");
                     groupedByDay[day].forEach(item => {
                         const row = document.createElement("tr");
@@ -367,7 +382,7 @@
                 console.error("Error al cargar los datos del día:", error);
             }
         }
-        
+
 
     </script>
 

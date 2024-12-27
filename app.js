@@ -1,3 +1,4 @@
+require('dotenv').config(); // Carga las variables de entorno
 const express = require('express');
 const session = require('express-session');
 const mysql = require('mysql2');
@@ -16,24 +17,14 @@ app.use('/api', foodRoutes); // Asocia todas las rutas de foodRoutes al prefijo 
 
 // Configuración de la sesión
 app.use(session({
-    secret: 'mi_secreto', // Cambia esto por una clave segura
+    secret: process.env.SESSION_SECRET, // Se obtiene de las variables de entorno
     resave: false,
     saveUninitialized: true,
-    cookie: { maxAge: 600000 } // Duración de la sesión en milisegundos (10 minutos)
+    cookie: { maxAge: 600000 }
 }));
 
 // Configuración de la conexión a la base de datos MySQL
-const db = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',       // Cambia esto por tu usuario de MySQL
-    password: 'root',   // Cambia esto por tu contraseña de MySQL
-    database: 'calbalance'
-});
-
-db.connect((err) => {
-    if (err) throw err;
-    console.log('Conectado a la base de datos MySQL');
-});
+const db = require('./config/db'); // Se importa la conexión a la base de datos
 
 // Rutas
 app.use('/api/users', userRoutes);

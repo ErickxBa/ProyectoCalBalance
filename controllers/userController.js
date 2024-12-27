@@ -4,7 +4,7 @@ const userModel = require('../models/userModel');
 exports.registerUser = (req, res) => {
     const { nombre_completo, correo, edad, genero, altura, nivel_actividad, password } = req.body;
 
-    userModel.createUser(nombre_completo, correo, edad, genero, altura, nivel_actividad, password, (err, result) => {
+    userModel.createUser({ nombre_completo, correo, edad, genero, altura, nivel_actividad, password }, (err, result) => {
         if (err) {
             console.error('Detalles del error:', err);
             return res.status(500).json({ error: 'Error al registrar usuario' });
@@ -12,13 +12,14 @@ exports.registerUser = (req, res) => {
 
         req.session.user = {
             id: result.insertId,
-            nombre_completo: nombre_completo,
-            correo: correo
+            nombre_completo,
+            correo
         };
 
         res.json({ success: true });
     });
 };
+
 
 // Inicio de sesión
 exports.loginUser = (req, res) => {

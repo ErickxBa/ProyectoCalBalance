@@ -129,6 +129,12 @@ nav a {
     font-size: 0.9em;
 }
 
+.info-text {
+    font-size: 0.9rem;
+    color: #666;
+    margin-top: 5px;
+}
+
 /* Ventana emergente de registro de alimentos */
 .food-register-popup {
     display: none;

@@ -11,6 +11,7 @@
   "description": "El sistema de control de alimentación y cálculo de calorías tiene como objetivo ayudar a los usuarios a monitorear su consumo diario de alimentos, calcular sus necesidades calóricas y promover hábitos alimenticios saludables basados en sus objetivos nutricionales.",
   "dependencies": {
     "body-parser": "^1.20.3",
+    "dotenv": "^16.4.7",
     "express": "^4.21.1",
     "express-session": "^1.18.1",
     "mysql": "^2.18.1",
