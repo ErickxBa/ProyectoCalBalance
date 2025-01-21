@@ -13,16 +13,21 @@ exports.registerFoodConsumption = async (req, res) => {
 };
 
 // Obtener historial de consumo de alimentos
-exports.getConsumptionHistory = async (req, res) => {
+exports.getConsumptionHistory = (req, res) => {
     const userId = req.params.userId;
 
-    try {
-        const history = await foodModel.getHistoryByUserId(userId);
-        res.status(200).json(history);
-    } catch (err) {
-        res.status(500).json({ error: 'Error al obtener historial de consumo' });
+    if (req.session.user.id !== parseInt(userId, 10)) {
+        return res.status(403).json({ error: 'Acceso denegado' });
     }
+
+    foodModel.getHistoryByUserId(userId, (err, history) => {
+        if (err) {
+            return res.status(500).json({ error: 'Error al obtener historial de consumo' });
+        }
+        res.status(200).json(history);
+    });
 };
+
 
 // Obtener lista de alimentos
 exports.getFoodList = async (req, res) => {
@@ -34,33 +39,38 @@ exports.getFoodList = async (req, res) => {
     }
 };
 
-// Calcular calorías restantes
+
 exports.getRemainingCalories = async (req, res) => {
     const userId = req.params.userId;
 
     try {
-        // Obtener el objetivo diario de calorías del usuario
-        const dailyGoal = await foodModel.getUserDailyGoal(userId);
+        const result = await foodModel.getRemainingCalories(userId);
 
-        // Obtener calorías consumidas en el día actual
-        const caloriesConsumed = await foodModel.getCaloriesConsumedToday(userId);
+        if (!result.dailyGoal) {
+            return res.status(404).json({
+                error: 'No se encontró un objetivo de calorías para este usuario.'
+            });
+        }
 
-        // Calcular calorías restantes
-        const remainingCalories = dailyGoal - caloriesConsumed;
-
-        // Verificar si el usuario ha excedido el límite diario
-        if (remainingCalories < 0) {
+        if (result.hasExceeded) {
             return res.status(200).json({
+                dailyGoal: result.dailyGoal,
+                caloriesConsumed: result.caloriesConsumed,
                 remainingCalories: 0,
                 message: 'Has excedido tu límite diario de calorías.'
             });
         }
 
         res.status(200).json({
-            remainingCalories,
+            dailyGoal: result.dailyGoal,
+            caloriesConsumed: result.caloriesConsumed,
+            remainingCalories: result.remainingCalories,
             message: 'Estás dentro de tu objetivo diario de calorías.'
         });
     } catch (err) {
+        console.error('Error en getRemainingCalories:', err);
         res.status(500).json({ error: 'Error al calcular las calorías restantes' });
     }
 };
+
+

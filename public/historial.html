@@ -51,6 +51,11 @@
         <!-- Sección de resumen que aparecerá al hacer clic en los botones -->
         <section class="summary-section" id="summary-section">
             <h2 id="summary-title">Resumen</h2>
+
+            <div id="remaining-calories-alert" class="calories-alert">
+                <!-- Este contenido se llenará dinámicamente -->
+            </div>
+
             <div class="day-card-container" id="day-card-container">
                 <!-- Tarjeta de ejemplo que será clonada dinámicamente -->
                 <div class="day-card template-card" style="display: none;">
@@ -117,6 +122,48 @@
 
     <script>
         let userId;
+
+
+        async function loadRemainingCalories(userId) {
+            try {
+                // Llamar al backend para obtener las calorías restantes
+                const response = await fetch(`/api/calorias_restantes/${userId}`);
+                const data = await response.json();
+        
+                const alertContainer = document.getElementById('remaining-calories-alert');
+        
+                // Limpiar contenido anterior
+                alertContainer.innerHTML = '';
+        
+                // Mostrar el mensaje dinámico
+                const message = document.createElement('p');
+                if (data.remainingCalories === 0 && data.caloriesConsumed > data.dailyGoal) {
+                    // Si excedió el límite
+                    message.textContent = 'Has excedido tu límite diario de calorías.';
+                    message.classList.add('alert-danger');
+                } else {
+                    // Si está dentro del límite
+                    message.textContent = `Te quedan ${data.remainingCalories} calorías por consumir hoy.`;
+                    message.classList.add('alert-success');
+                }
+                alertContainer.appendChild(message);
+            } catch (error) {
+                console.error('Error al obtener las calorías restantes:', error);
+            }
+        }
+        
+        // Llamar a la función cuando se haga clic en "Resumen Semanal" o "Resumen Mensual"
+        document.getElementById("weekly-view").addEventListener("click", function () {
+            showSummary("Resumen Semanal");
+            loadRemainingCalories(userId); // Actualizar el estado de calorías
+        });
+        
+        document.getElementById("monthly-view").addEventListener("click", function () {
+            showSummary("Resumen Mensual");
+            loadRemainingCalories(userId); // Actualizar el estado de calorías
+        });
+        
+        
 
         // Obtener el userId del usuario autenticado
         async function fetchUserId() {
@@ -382,8 +429,6 @@
                 console.error("Error al cargar los datos del día:", error);
             }
         }
-
-
     </script>
 
 </body>
