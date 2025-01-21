@@ -399,40 +399,29 @@ footer {
         display: block;
     }
 
-    /* Estilos de las tarjetas */
-    .day-card-container {  
-        display: flex;
-        flex-wrap: wrap;
+    .day-card-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
         gap: 15px;
         margin-top: 20px;
     }
-
-    .day-card {
-        background-color: #f9f9f9;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        padding: 15px;
-        width: calc(33.33% - 10px);
-        box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
-    }
-
-    .day-card h3 {
-        font-size: 1.2em;
-        margin-bottom: 10px;
-    }
-
+    
     .day-card table {
         width: 100%;
-        font-size: 0.9em;
-        border-collapse: collapse;
+        text-align: left;
     }
-
-    .day-card th,
-    .day-card td {
+    
+    .day-card th, .day-card td {
         padding: 8px;
         border: 1px solid #ddd;
-        text-align: center;
     }
+    
+    @media (max-width: 768px) {
+        .sidebar, .summary-section {
+            width: 100%;
+        }
+    }
+    
 
     /* Botón */
     .view-button {

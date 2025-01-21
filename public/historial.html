@@ -173,35 +173,36 @@
             document.querySelector(".main-container").classList.remove("shift-left");
         });
 
-        // Configuración del gráfico de calorías
-        const ctx = document.getElementById('caloriesChart').getContext('2d');
-        const caloriesChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'],
-                datasets: [
-                    {
-                        label: 'Calorías Consumidas',
-                        data: [2000, 1800, 2100, 1900, 2200, 1750, 1950],
-                        borderColor: 'rgba(75, 192, 192, 1)',
-                        fill: false
-                    },
-                    {
-                        label: 'Calorías Recomendadas',
-                        data: [2000, 2000, 2000, 2000, 2000, 2000, 2000],
-                        borderColor: 'rgba(255, 99, 132, 1)',
-                        borderDash: [5, 5],
-                        fill: false
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    y: { beginAtZero: true }
-                }
+        // Configurar grafica dinamica con datos reales
+        async function loadChartData(userId) {
+            try {
+                const response = await fetch(`/api/foods/history/${userId}`);
+                const history = await response.json();
+
+                const dailyCalories = {}; // { 'Lunes': 2000, ... }
+
+                history.forEach(item => {
+                    const date = new Date(item.fecha);
+                    const day = date.toLocaleDateString('es-ES', { weekday: 'long' });
+                    dailyCalories[day] = (dailyCalories[day] || 0) + item.calorias_consumidas;
+                });
+
+                // Crear dataset con los días de la semana
+                const labels = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+                const data = labels.map(day => dailyCalories[day] || 0);
+
+                caloriesChart.data.datasets[0].data = data;
+                caloriesChart.update();
+            } catch (error) {
+                console.error("Error al cargar datos para la grafica:", error);
             }
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            fetchUserId(); // Para obtener userId
+            loadChartData(userId); // Para cargar los datos reales
         });
+
 
         // Mostrar ventana emergente de registro de alimentos
         const popup = document.getElementById('food-register-popup');
