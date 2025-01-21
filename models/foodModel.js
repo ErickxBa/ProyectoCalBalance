@@ -38,3 +38,26 @@ exports.getHistoryByUserId = async (userId) => {
 exports.getAllFoods = async () => {
     return await Food.find().sort('nombre').exec();
 };
+
+exports.getCaloriesConsumedToday = async (userId) => {
+    const today = new Date();
+    const startOfDay = new Date(today.setHours(0, 0, 0, 0));
+    const endOfDay = new Date(today.setHours(23, 59, 59, 999));
+
+    const result = await FoodConsumption.aggregate([
+        {
+            $match: {
+                usuario_id: mongoose.Types.ObjectId(userId),
+                fecha: { $gte: startOfDay, $lte: endOfDay }
+            }
+        },
+        {
+            $group: {
+                _id: null,
+                totalCalories: { $sum: "$calorias_consumidas" }
+            }
+        }
+    ]);
+
+    return result.length > 0 ? result[0].totalCalories : 0;
+};

@@ -22,7 +22,6 @@ exports.createUser = async ({ nombre_completo, correo, edad, genero, altura, niv
         nivel_actividad,
         password
     });
-
     return await newUser.save();
 };
 

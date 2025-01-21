@@ -33,3 +33,34 @@ exports.getFoodList = async (req, res) => {
         res.status(500).json({ error: 'Error al obtener la lista de alimentos' });
     }
 };
+
+// Calcular calorías restantes
+exports.getRemainingCalories = async (req, res) => {
+    const userId = req.params.userId;
+
+    try {
+        // Obtener el objetivo diario de calorías del usuario
+        const dailyGoal = await foodModel.getUserDailyGoal(userId);
+
+        // Obtener calorías consumidas en el día actual
+        const caloriesConsumed = await foodModel.getCaloriesConsumedToday(userId);
+
+        // Calcular calorías restantes
+        const remainingCalories = dailyGoal - caloriesConsumed;
+
+        // Verificar si el usuario ha excedido el límite diario
+        if (remainingCalories < 0) {
+            return res.status(200).json({
+                remainingCalories: 0,
+                message: 'Has excedido tu límite diario de calorías.'
+            });
+        }
+
+        res.status(200).json({
+            remainingCalories,
+            message: 'Estás dentro de tu objetivo diario de calorías.'
+        });
+    } catch (err) {
+        res.status(500).json({ error: 'Error al calcular las calorías restantes' });
+    }
+};
