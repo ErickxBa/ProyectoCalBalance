@@ -10,7 +10,7 @@ const userSchema = new mongoose.Schema({
     password: { type: String, required: true }
 });
 
-const User = mongoose.model('User', userSchema);
+const User = mongoose.model('usuarios', userSchema);
 
 exports.createUser = async ({ nombre_completo, correo, edad, genero, altura, nivel_actividad, password }) => {
     const newUser = new User({

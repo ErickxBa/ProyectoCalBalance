@@ -4,7 +4,7 @@ const foodSchema = new mongoose.Schema({
     nombre: String,
     calorias_por_porcion: Number,
     tipo: String
-});
+}, { collection: 'alimentos' }); // Especifica el nombre de la colección
 
 const foodConsumptionSchema = new mongoose.Schema({
     usuario_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
@@ -12,7 +12,7 @@ const foodConsumptionSchema = new mongoose.Schema({
     cantidad: Number,
     calorias_consumidas: Number,
     fecha: { type: Date, default: Date.now }
-});
+}, { collection: 'consumo_alimentos' }); // Especifica el nombre de la colección
 
 const Food = mongoose.model('Food', foodSchema);
 const FoodConsumption = mongoose.model('FoodConsumption', foodConsumptionSchema);

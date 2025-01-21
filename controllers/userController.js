@@ -3,6 +3,9 @@ const userModel = require('../models/userModel');
 // Registro de usuario
 exports.registerUser = async (req, res) => {
     const { nombre_completo, correo, edad, genero, altura, nivel_actividad, password } = req.body;
+    console.log('Datos recibidos:', req.body); // Verifica los datos enviados por el cliente
+
+
 
     try {
         const user = await userModel.createUser({ nombre_completo, correo, edad, genero, altura, nivel_actividad, password });
