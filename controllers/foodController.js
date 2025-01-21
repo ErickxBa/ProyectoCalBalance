@@ -1,51 +1,35 @@
 const foodModel = require('../models/foodModel');
 
 // Registro de consumo de alimentos
-exports.registerFoodConsumption = (req, res) => {
-    const { usuario_id, alimento, porcion, calorias } = req.body;
+exports.registerFoodConsumption = async (req, res) => {
+    const { usuario_id, alimento_id, porcion, calorias } = req.body;
 
-    foodModel.addFoodConsumption(usuario_id, alimento, porcion, calorias, (err, result) => {
-        if (err) {
-            return res.status(500).json({ error: 'Error al registrar alimento' });
-        }
+    try {
+        await foodModel.addFoodConsumption(usuario_id, alimento_id, porcion, calorias);
         res.status(201).json({ message: 'Consumo de alimento registrado exitosamente' });
-    });
+    } catch (err) {
+        res.status(500).json({ error: 'Error al registrar alimento' });
+    }
 };
 
 // Obtener historial de consumo de alimentos
-exports.getConsumptionHistory = (req, res) => {
+exports.getConsumptionHistory = async (req, res) => {
     const userId = req.params.userId;
 
-    foodModel.getHistoryByUserId(userId, (err, history) => {
-        if (err) {
-            return res.status(500).json({ error: 'Error al obtener historial de consumo' });
-        }
+    try {
+        const history = await foodModel.getHistoryByUserId(userId);
         res.status(200).json(history);
-    });
+    } catch (err) {
+        res.status(500).json({ error: 'Error al obtener historial de consumo' });
+    }
 };
 
 // Obtener lista de alimentos
-exports.getFoodList = (req, res) => {
-    foodModel.getAllFoods((err, foods) => {
-        if (err) {
-            return res.status(500).json({ error: 'Error al obtener la lista de alimentos' });
-        }
+exports.getFoodList = async (req, res) => {
+    try {
+        const foods = await foodModel.getAllFoods();
         res.status(200).json(foods);
-    });
-};
-
-exports.getConsumptionHistory = (req, res) => {
-    const userId = req.params.userId;
-
-    // Verificar que el usuario autenticado está accediendo a su propio historial
-    if (req.session.user.id !== parseInt(userId, 10)) {
-        return res.status(403).json({ error: 'Acceso denegado' });
+    } catch (err) {
+        res.status(500).json({ error: 'Error al obtener la lista de alimentos' });
     }
-
-    foodModel.getHistoryByUserId(userId, (err, history) => {
-        if (err) {
-            return res.status(500).json({ error: 'Error al obtener historial de consumo' });
-        }
-        res.status(200).json(history);
-    });
 };

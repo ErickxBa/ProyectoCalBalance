@@ -1,7 +1,7 @@
 require('dotenv').config(); // Carga las variables de entorno
 const express = require('express');
 const session = require('express-session');
-const mysql = require('mysql2');
+const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 
 const userRoutes = require('./routes/userRoutes');
@@ -23,8 +23,16 @@ app.use(session({
     cookie: { maxAge: 600000 }
 }));
 
-// Configuración de la conexión a la base de datos MySQL
-const db = require('./config/db'); // Se importa la conexión a la base de datos
+// Configuración de la conexión a la base de datos MongoDB
+const mongoURI = process.env.MONGO_URI;
+
+mongoose.connect(mongoURI)
+    .then(() => {
+        console.log('Conectado a la base de datos MongoDB Atlas.');
+    })
+    .catch((err) => {
+        console.error('Error al conectar a MongoDB Atlas:', err.message);
+    });
 
 // Rutas
 app.use('/api/users', userRoutes);

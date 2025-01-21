@@ -1,14 +1,31 @@
-const db = require('../config/db');
+const mongoose = require('mongoose');
 
-exports.createUser = ({ nombre_completo, correo, edad, genero, altura, nivel_actividad, password }, callback) => {
-    const sql = `INSERT INTO usuarios (nombre_completo, correo, edad, genero, altura, nivel_actividad, password) VALUES (?, ?, ?, ?, ?, ?, ?)`;
-    db.query(sql, [nombre_completo, correo, edad, genero, altura, nivel_actividad, password], callback);
+const userSchema = new mongoose.Schema({
+    nombre_completo: { type: String, required: true },
+    correo: { type: String, required: true, unique: true },
+    edad: { type: Number, required: true },
+    genero: { type: String, required: true },
+    altura: { type: Number, required: true },
+    nivel_actividad: { type: String, required: true },
+    password: { type: String, required: true }
+});
+
+const User = mongoose.model('User', userSchema);
+
+exports.createUser = async ({ nombre_completo, correo, edad, genero, altura, nivel_actividad, password }) => {
+    const newUser = new User({
+        nombre_completo,
+        correo,
+        edad,
+        genero,
+        altura,
+        nivel_actividad,
+        password
+    });
+
+    return await newUser.save();
 };
 
-exports.getUserByEmailAndPassword = (correo, password, callback) => {
-    const sql = `SELECT * FROM usuarios WHERE correo = ? AND password = ?`;
-    db.query(sql, [correo, password], (err, results) => {
-        if (err) return callback(err);
-        callback(null, results[0]);
-    });
+exports.getUserByEmailAndPassword = async (correo, password) => {
+    return await User.findOne({ correo, password });
 };
