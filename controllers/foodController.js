@@ -2,10 +2,10 @@ const foodModel = require('../models/foodModel');
 
 // Registro de consumo de alimentos
 exports.registerFoodConsumption = async (req, res) => {
-    const { usuario_id, alimento_id, porcion, calorias } = req.body;
+    const { usuario_id, alimento_id, porcion, calorias_consumidas } = req.body;
 
     try {
-        await foodModel.addFoodConsumption(usuario_id, alimento_id, porcion, calorias);
+        await foodModel.addFoodConsumption(usuario_id, alimento_id, porcion, calorias_consumidas);
         res.status(201).json({ message: 'Consumo de alimento registrado exitosamente' });
     } catch (err) {
         res.status(500).json({ error: 'Error al registrar alimento' });
@@ -39,16 +39,10 @@ exports.getRemainingCalories = async (req, res) => {
     const userId = req.params.userId;
 
     try {
-        // Obtener el objetivo diario de calorías del usuario
         const dailyGoal = await foodModel.getUserDailyGoal(userId);
-
-        // Obtener calorías consumidas en el día actual
         const caloriesConsumed = await foodModel.getCaloriesConsumedToday(userId);
-
-        // Calcular calorías restantes
         const remainingCalories = dailyGoal - caloriesConsumed;
 
-        // Verificar si el usuario ha excedido el límite diario
         if (remainingCalories < 0) {
             return res.status(200).json({
                 remainingCalories: 0,

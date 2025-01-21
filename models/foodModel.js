@@ -4,35 +4,37 @@ const foodSchema = new mongoose.Schema({
     nombre: String,
     calorias_por_porcion: Number,
     tipo: String
-}, { collection: 'alimentos' }); // Especifica el nombre de la colección
+}, { collection: 'alimentos' });
 
 const foodConsumptionSchema = new mongoose.Schema({
-    usuario_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-    alimento_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Food' },
-    cantidad: Number,
-    calorias_consumidas: Number,
-    fecha: { type: Date, default: Date.now }
-}, { collection: 'consumo_alimentos' }); // Especifica el nombre de la colección
+    usuario_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    alimento_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Food', required: true },
+    porcion: { type: Number, required: true },
+    calorias_consumidas: { type: Number, required: true },
+    fecha: { type: Date, default: Date.now },
+    hora: { type: String, required: true },
+    alimento: { type: String, required: true }
+}, { collection: 'consumo_alimentos' });
 
 const Food = mongoose.model('Food', foodSchema);
 const FoodConsumption = mongoose.model('FoodConsumption', foodConsumptionSchema);
 
-exports.addFoodConsumption = async (usuario_id, alimento_id, cantidad, calorias_consumidas) => {
-    const newConsumption = new FoodConsumption({
+exports.addFoodConsumption = async (usuario_id, alimento_id, porcion, calorias_consumidas) => {
+    const alimento = await Food.findById(alimento_id);
+    const hora = new Date().toLocaleTimeString('es-ES');
+    const foodConsumption = new FoodConsumption({
         usuario_id,
         alimento_id,
-        cantidad,
-        calorias_consumidas
+        porcion,
+        calorias_consumidas,
+        hora,
+        alimento: alimento.nombre
     });
-
-    return await newConsumption.save();
+    await foodConsumption.save();
 };
 
 exports.getHistoryByUserId = async (userId) => {
-    return await FoodConsumption.find({ usuario_id: userId })
-        .populate('alimento_id', 'nombre')
-        .sort({ fecha: -1 })
-        .exec();
+    return await FoodConsumption.find({ usuario_id: userId }).select('hora alimento porcion calorias_consumidas fecha');
 };
 
 exports.getAllFoods = async () => {
