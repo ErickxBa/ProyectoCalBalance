@@ -172,6 +172,7 @@
             if (data.user) {
                 userId = data.user.id; // Guardar el ID del usuario autenticado
                 loadConsumptionHistory(userId); // Cargar el historial al obtener el userId
+                loadChartData(userId); // Cargar los datos para la gráfica
             } else {
                 alert('Error al obtener el perfil del usuario');
                 window.location.href = 'index.html';
@@ -220,35 +221,48 @@
             document.querySelector(".main-container").classList.remove("shift-left");
         });
 
-        // Configuración del gráfico de calorías
-        const ctx = document.getElementById('caloriesChart').getContext('2d');
-        const caloriesChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'],
-                datasets: [
-                    {
-                        label: 'Calorías Consumidas',
-                        data: [2000, 1800, 2100, 1900, 2200, 1750, 1950],
-                        borderColor: 'rgba(75, 192, 192, 1)',
-                        fill: false
+        // Configurar grafica dinamica con datos reales
+        async function loadChartData(userId) {
+            try {
+                const response = await fetch(`/api/foods/history/${userId}`);
+                const history = await response.json();
+
+                const dailyCalories = {}; // { '2025-01-20': 2000, ... }
+
+                history.forEach(item => {
+                    const date = new Date(item.fecha).toLocaleDateString('es-ES');
+                    dailyCalories[date] = (dailyCalories[date] || 0) + item.calorias_consumidas;
+                });
+
+                // Crear dataset con las fechas
+                const labels = Object.keys(dailyCalories);
+                const data = labels.map(date => dailyCalories[date]);
+
+                const ctx = document.getElementById('caloriesChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Calorías Consumidas',
+                            data: data,
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 1
+                        }]
                     },
-                    {
-                        label: 'Calorías Recomendadas',
-                        data: [2000, 2000, 2000, 2000, 2000, 2000, 2000],
-                        borderColor: 'rgba(255, 99, 132, 1)',
-                        borderDash: [5, 5],
-                        fill: false
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
                     }
-                ]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    y: { beginAtZero: true }
-                }
+                });
+            } catch (error) {
+                console.error("Error al cargar datos para la grafica:", error);
             }
-        });
+        }
 
         // Mostrar ventana emergente de registro de alimentos
         const popup = document.getElementById('food-register-popup');
@@ -344,8 +358,9 @@
 
                 // Agrupar datos por fecha
                 const groupedByDate = history.reduce((acc, item) => {
-                    if (!acc[item.fecha]) acc[item.fecha] = [];
-                    acc[item.fecha].push(item);
+                    const date = new Date(item.fecha).toLocaleDateString('es-ES');
+                    if (!acc[date]) acc[date] = [];
+                    acc[date].push(item);
                     return acc;
                 }, {});
 
@@ -360,9 +375,9 @@
                     groupedByDate[date].forEach(item => {
                         const row = document.createElement("tr");
                         row.innerHTML = `
-                            <td>${item.hora}</td>
-                            <td>${item.alimento}</td>
-                            <td>${item.cantidad}</td>
+                            <td>${item.hora || 'N/A'}</td>
+                            <td>${item.alimento || 'N/A'}</td>
+                            <td>${item.porcion}</td>
                             <td>${item.calorias_consumidas}</td>
                         `;
                         tbody.appendChild(row);
