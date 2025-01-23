@@ -47,7 +47,6 @@
             </div>
         </section>
 
-
         <!-- Sección de resumen que aparecerá al hacer clic en los botones -->
         <section class="summary-section" id="summary-section">
             <h2 id="summary-title">Resumen</h2>
@@ -84,7 +83,17 @@
             <button id="back-button" class="view-button">Regresar</button>
         </section>
 
+        <!-- Sección de objetivo de calorías diarias -->
+        <section class="goal-section" id="goal-section">
+            <h2>Establecer Objetivo de Calorías Diarias</h2>
+            <form id="goalForm">
+                <label for="calorias_diarias">Calorías Diarias:</label>
+                <input type="number" id="calorias_diarias" name="calorias_diarias" required>
+                <button type="submit">Guardar Objetivo</button>
+            </form>
+        </section>
     </main>
+
     <!-- Ventana emergente de Registro de Alimentos -->
     <div id="food-register-popup" class="food-register-popup">
         <div class="food-register-content">
@@ -122,7 +131,6 @@
 
     <script>
         let userId;
-
 
         async function loadRemainingCalories(userId) {
             try {
@@ -162,8 +170,6 @@
             showSummary("Resumen Mensual");
             loadRemainingCalories(userId); // Actualizar el estado de calorías
         });
-        
-        
 
         // Obtener el userId del usuario autenticado
         async function fetchUserId() {
