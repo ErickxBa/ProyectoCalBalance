@@ -9,6 +9,10 @@ const foodRoutes = require('./routes/foodRoutes');
 
 const app = express();
 
+const cors = require('cors');
+app.use(cors());
+
+
 // Configuración del middleware
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: false }));

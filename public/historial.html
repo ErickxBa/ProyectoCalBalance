@@ -282,24 +282,30 @@
         // Registrar consumo de alimentos
         document.getElementById("food-form").addEventListener("submit", function (event) {
             event.preventDefault();
+        
             const alimento = document.getElementById("food-select").value;
             const porcion = document.getElementById("portion").value;
             const calorias = document.getElementById("calories").value;
-
+        
             // Usar el userId dinámico obtenido al cargar la página
-            fetch("/api/register", {
+            fetch("/api/foods/register", { // 🔹 Corregí la URL
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ usuario_id: userId, alimento, porcion, calorias })
-            })
-                .then(response => response.json())
-                .then(data => {
-                    alert(data.message);
-                    loadConsumptionHistory(userId); // Recargar el historial después del registro
+                body: JSON.stringify({
+                    usuario_id: userId, 
+                    alimento_id: alimento,  // 🔹 Asegurar que se envía `alimento_id`, no `alimento`
+                    cantidad: porcion,
+                    calorias_consumidas: calorias
                 })
-                .catch(error => console.error("Error al registrar el alimento:", error));
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                loadConsumptionHistory(userId); // Recargar el historial después del registro
+            })
+            .catch(error => console.error("Error al registrar el alimento:", error));
         });
-
+        
         // Cargar historial de consumo y crear tarjetas por día
         async function loadConsumptionHistory(userId) {
             try {
@@ -380,7 +386,7 @@
                 Object.keys(groupedByDay).forEach(day => {
                     const dayCard = document.createElement("div");
                     dayCard.classList.add("day-card");
-                    dayCard.innerHTML = `<h3>${day}</h3><table><thead><tr><th>Hora</th><th>Alimento</th><th>Cantidad</th><th>Calorías</th></tr></thead><tbody></tbody></table>`;
+                    dayCard.innerHTML = `<h3>${day}</h3><table><thead><tr><th>Hora</th><th>Cantidad</th><th>Calorías</th></tr></thead><tbody></tbody></table>`;
 
                     const tbody = dayCard.querySelector("tbody");
                     groupedByDay[day].forEach(item => {
