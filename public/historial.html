@@ -328,11 +328,13 @@
                     groupedByDate[date].forEach(item => {
                         const row = document.createElement("tr");
                         row.innerHTML = `
-                            <td>${item.hora || 'N/A'}</td>
-                            <td>${item.alimento || 'N/A'}</td>
-                            <td>${item.porcion}</td>
-                            <td>${item.calorias_consumidas}</td>
+                            <td>${item.fecha ? new Date(item.fecha).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }) : 'N/A'}</td>
+                            <td>${item.alimento_id ? item.alimento_id.nombre : 'N/A'}</td>
+                            <td>${item.cantidad ? item.cantidad : 'Sin datos'}</td>
+                            <td>${item.calorias_consumidas ? item.calorias_consumidas.toFixed(2) : '0'}</td>
                         `;
+
+
                         tbody.appendChild(row);
                     });
 
