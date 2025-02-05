@@ -321,7 +321,7 @@
                 Object.keys(groupedByDate).forEach(date => {
                     const dayCard = document.createElement("div");
                     dayCard.classList.add("day-card");
-                    dayCard.innerHTML = `<h3>${date}</h3><table><thead><tr><th>Hora</th><th>Alimento</th><th>Cantidad</th><th>Calorías</th></tr></thead><tbody></tbody></table>`;
+                    dayCard.innerHTML = `<h3>${date}</h3><table><thead><tr><th>Hora</th><th>Cantidad (Gramos)</th><th>Calorías</th></tr></thead><tbody></tbody></table>`;
 
                     const tbody = dayCard.querySelector("tbody");
 
@@ -329,7 +329,7 @@
                         const row = document.createElement("tr");
                         row.innerHTML = `
                             <td>${item.fecha ? new Date(item.fecha).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }) : 'N/A'}</td>
-                            <td>${item.alimento_id ? item.alimento_id.nombre : 'N/A'}</td>
+                            <!-- <td>${item.alimento_id ? item.alimento_id.nombre : 'N/A'}</td> -->
                             <td>${item.cantidad ? item.cantidad : 'Sin datos'}</td>
                             <td>${item.calorias_consumidas ? item.calorias_consumidas.toFixed(2) : '0'}</td>
                         `;
