@@ -3,30 +3,16 @@ const userModel = require('../models/userModel');
 
 // Registro de consumo de alimentos
 exports.registerFoodConsumption = async (req, res) => {
-    const mongoose = require('mongoose');
-
-const registerFood = async (req, res) => {
+    const { usuario_id, alimento_id, cantidad, calorias_consumidas } = req.body;
     try {
-        const { usuario_id, alimento, cantidad, calorias } = req.body;
-
-        const nuevaEntrada = new FoodModel({
-            usuario_id: mongoose.Types.ObjectId(usuario_id),  // Convertir a ObjectId
-            alimento_id: mongoose.Types.ObjectId(alimento),  // Convertir a ObjectId
-            cantidad,
-            calorias_consumidas: calorias,
-            fecha: new Date()
-        });
-
-        await nuevaEntrada.save();
-        res.json({ success: true, message: 'Alimento registrado con éxito' });
-
-    } catch (error) {
-        console.error('Error al registrar el alimento:', error);
-        res.status(500).json({ success: false, message: 'Error al registrar el alimento' });
+        await foodModel.addFoodConsumption(usuario_id, alimento_id, cantidad, calorias_consumidas);
+        res.status(201).json({ message: 'Consumo de alimento registrado exitosamente' });
+    } catch (err) {
+        res.status(500).json({ error: 'Error al registrar alimento' });
     }
 };
 
-};
+
 
 // Obtener historial de consumo de alimentos
 exports.getConsumptionHistory = async (req, res) => {

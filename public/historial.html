@@ -87,20 +87,16 @@
             <h1>Registrar Consumo de Alimentos</h1>
             <form class="food-form" id="food-form">
                 <label for="food-select">Selecciona un Alimento</label>
-                <select id="food-select" name="food">
+                <select id="food-select" name="alimento">
                     <option value="" disabled selected>Seleccione un alimento</option>
                 </select>
-
-                <label for="portion">Porción (g/kg/taza)</label>
-                <input type="number" id="portion" name="portion" placeholder="Ej. 100" required>
-
+            
+                <label for="cantidad">Porción (g/kg/taza)</label>
+                <input type="number" id="cantidad" name="cantidad" placeholder="Ej. 100" required>
+            
                 <label for="calories">Calorías</label>
-                <input type="text" id="calories" name="calories" readonly>
-                <p id="calorie-info" class="info-text">
-                    El cálculo de calorías se realiza multiplicando las calorías por porción del alimento seleccionado
-                    por la cantidad especificada (en gramos, kilogramos o tazas) y luego dividiendo entre 100.
-                </p>
-
+                <input type="text" id="calories" name="calorias" readonly>
+            
                 <label for="meal-type">Tipo de Comida</label>
                 <select id="meal-type" name="meal-type" required>
                     <option value="" disabled selected>Seleccione el tipo de comida</option>
@@ -109,7 +105,7 @@
                     <option value="cena">Cena</option>
                     <option value="snack">Snack</option>
                 </select>
-
+            
                 <button type="submit" class="view-button">Registrar Alimento</button>
             </form>
         </div>
@@ -257,7 +253,7 @@
         document.getElementById("food-select").addEventListener("change", function () {
             const selectedOption = this.selectedOptions[0];
             const caloriasPorPorcion = parseInt(selectedOption.getAttribute("data-calorias")) || 0;
-            const porcion = parseInt(document.getElementById("portion").value) || 0;
+            const porcion = parseInt(document.getElementById("cantidad").value) || 0;
             const caloriasCalculadas = (caloriasPorPorcion * porcion / 100).toFixed(2);
             document.getElementById("calories").value = caloriasCalculadas;
 
@@ -266,7 +262,7 @@
             document.getElementById("calorie-info").textContent = infoText;
         });
 
-        document.getElementById("portion").addEventListener("input", function () {
+        document.getElementById("cantidad").addEventListener("input", function () {
             const foodSelect = document.getElementById("food-select");
             const selectedOption = foodSelect.selectedOptions[0];
             const caloriasPorPorcion = parseInt(selectedOption.getAttribute("data-calorias")) || 0;
@@ -283,14 +279,14 @@
         document.getElementById("food-form").addEventListener("submit", function (event) {
             event.preventDefault();
             const alimento = document.getElementById("food-select").value;
-            const porcion = document.getElementById("portion").value;
+            const cantidad = document.getElementById("cantidad").value; // Asegúrate de usar "portion" aquí
             const calorias = document.getElementById("calories").value;
-
+        
             // Usar el userId dinámico obtenido al cargar la página
             fetch("/api/register", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ usuario_id: userId, alimento, porcion, calorias })
+                body: JSON.stringify({ usuario_id: userId, alimento, cantidad, calorias })
             })
                 .then(response => response.json())
                 .then(data => {
@@ -299,7 +295,6 @@
                 })
                 .catch(error => console.error("Error al registrar el alimento:", error));
         });
-
         // Cargar historial de consumo y crear tarjetas por día
         async function loadConsumptionHistory(userId) {
             try {
